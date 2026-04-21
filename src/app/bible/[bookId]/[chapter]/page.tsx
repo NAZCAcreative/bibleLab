@@ -277,10 +277,10 @@ export default function BibleReaderPage() {
 
 function LoginPromptModal({ onClose }: { onClose: () => void }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center" onClick={onClose}>
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
       <div
-        className="relative w-full max-w-sm mb-6 mx-4 bg-white rounded-3xl shadow-2xl p-6 flex flex-col items-center gap-4"
+        className="relative w-full max-w-sm mx-4 bg-white rounded-3xl shadow-2xl p-6 flex flex-col items-center gap-4"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="w-14 h-14 rounded-full flex items-center justify-center" style={{ backgroundColor: '#1a3d5c18' }}>
