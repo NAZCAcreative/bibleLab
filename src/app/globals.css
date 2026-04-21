@@ -1,0 +1,100 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* 기본 폰트 스택 */
+  --font-sans:  'Noto Sans KR', system-ui, -apple-system, sans-serif;
+  --font-serif: 'Noto Serif KR', Georgia, serif;
+
+  /* 한글 폰트 CSS 변수 (30개) */
+  --font-noto-sans-kr:          'Noto Sans KR';
+  --font-noto-serif-kr:         'Noto Serif KR';
+  --font-gothic-a1:             'Gothic A1';
+  --font-nanum-gothic:          'Nanum Gothic';
+  --font-nanum-myeongjo:        'Nanum Myeongjo';
+  --font-nanum-gothic-coding:   'Nanum Gothic Coding';
+  --font-black-han-sans:        'Black Han Sans';
+  --font-do-hyeon:              'Do Hyeon';
+  --font-jua:                   'Jua';
+  --font-sunflower:             'Sunflower';
+  --font-gaegu:                 'Gaegu';
+  --font-gamja-flower:          'Gamja Flower';
+  --font-hi-melody:             'Hi Melody';
+  --font-kirang-haerang:        'Kirang Haerang';
+  --font-yeon-sung:             'Yeon Sung';
+  --font-poor-story:            'Poor Story';
+  --font-east-sea-dokdo:        'East Sea Dokdo';
+  --font-cute-font:             'Cute Font';
+  --font-song-myung:            'Song Myung';
+  --font-nanum-pen-script:      'Nanum Pen Script';
+  --font-gugi:                  'Gugi';
+  --font-gowun-dodum:           'Gowun Dodum';
+  --font-gowun-batang:          'Gowun Batang';
+  --font-orbit:                 'Orbit';
+  --font-hahmlet:               'Hahmlet';
+  --font-ibm-plex-sans-kr:      'IBM Plex Sans KR';
+  --font-single-day:            'Single Day';
+  --font-dokdo:                 'Dokdo';
+  --font-nanum-brush-script:    'Nanum Brush Script';
+  --font-black-and-white-picture: 'Black And White Picture';
+
+  /* 영문 폰트 CSS 변수 (30개) */
+  --font-lora:              'Lora';
+  --font-merriweather:      'Merriweather';
+  --font-eb-garamond:       'EB Garamond';
+  --font-playfair-display:  'Playfair Display';
+  --font-crimson-text:      'Crimson Text';
+  --font-cormorant-garamond:'Cormorant Garamond';
+  --font-libre-baskerville: 'Libre Baskerville';
+  --font-spectral:          'Spectral';
+  --font-pt-serif:          'PT Serif';
+  --font-alegreya:          'Alegreya';
+  --font-josefin-sans:      'Josefin Sans';
+  --font-raleway:           'Raleway';
+  --font-nunito:            'Nunito';
+  --font-open-sans:         'Open Sans';
+  --font-poppins:           'Poppins';
+  --font-work-sans:         'Work Sans';
+  --font-dm-sans:           'DM Sans';
+  --font-source-serif-4:    'Source Serif 4';
+  --font-frank-ruhl-libre:  'Frank Ruhl Libre';
+  --font-inter:             'Inter';
+  --font-roboto:            'Roboto';
+  --font-montserrat:        'Montserrat';
+  --font-ubuntu:            'Ubuntu';
+  --font-oswald:            'Oswald';
+  --font-lato:              'Lato';
+  --font-source-code-pro:   'Source Code Pro';
+  --font-roboto-slab:       'Roboto Slab';
+  --font-bitter:            'Bitter';
+  --font-arvo:              'Arvo';
+  --font-vollkorn:          'Vollkorn';
+}
+
+/* 모바일 터치 최적화 */
+* {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  font-family: var(--font-sans);
+}
+
+/* 성경 본문: 세리프 폰트 적용 */
+.bible-text {
+  font-family: var(--font-serif);
+  line-height: 1.95;
+  word-break: keep-all;
+  word-spacing: 0.02em;
+}
+
+/* 스크롤바 숨김 (모바일 느낌) */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}

@@ -1,0 +1,350 @@
+// Design Ref: §3.4 — PostgreSQL 스키마 (Prisma)
+// Plan SC: FR-01 — Verse.text_en(KJV) + text_ko(번역) 분리 구조
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────
+// 성경 데이터 (공개 도메인 KJV + 한국어 번역)
+// ─────────────────────────────────────────
+
+model Book {
+  id            Int     @id
+  nameEn        String
+  nameKo        String
+  nameAbbr      String
+  testament     String
+  totalChapters Int
+  verses        Verse[]
+}
+
+model Verse {
+  id         String      @id @default(cuid())
+  bookId     Int
+  chapter    Int
+  verse      Int
+  textEn     String      @db.Text
+  textKo     String      @db.Text
+  book       Book        @relation(fields: [bookId], references: [id])
+  highlights Highlight[]
+  memos      Memo[]
+  verseReads VerseRead[]
+
+  @@unique([bookId, chapter, verse])
+  @@index([bookId, chapter])
+}
+
+// ─────────────────────────────────────────
+// 사용자 인증 (NextAuth.js)
+// ─────────────────────────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  password      String?
+  name          String?
+  emailVerified DateTime?
+  image         String?
+  createdAt     DateTime  @default(now())
+
+  // 역할 / 상태
+  role          String    @default("user")   // "user" | "admin"
+  status        String    @default("active") // "active" | "suspended"
+
+  // 읽기 설정 (DB 저장)
+  fontFamily    String?
+  fontSize      String?
+
+  // 통독 전승
+  prestige      Int       @default(0)
+
+  // 추가 프로필
+  phone         String?
+  gender        String?   // "male" | "female" | "other"
+  birthYear     Int?
+  church        String?
+  region        String?
+  bio           String?   @db.Text
+  agreedToTerms Boolean   @default(false)
+  useYn         Boolean   @default(true)
+
+  highlights      Highlight[]
+  memos           Memo[]
+  readingProgress ReadingProgress[]
+  qtNotes         QTNote[]
+  accounts        Account[]
+  sessions        Session[]
+  activityLogs    UserActivityLog[]
+  userBadges      UserBadge[]
+  posts           Post[]
+  comments        Comment[]
+  changeRequests  ChangeRequest[]
+  readingTimeLogs ReadingTimeLog[]
+  verseReads      VerseRead[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ─────────────────────────────────────────
+// 접속 기록 (관리자 모니터링)
+// ─────────────────────────────────────────
+
+model UserActivityLog {
+  id        String   @id @default(cuid())
+  userId    String
+  action    String   // "login" | "logout" | "page_view"
+  path      String?
+  ipAddress String?
+  userAgent String?
+  duration  Int?     // seconds (로그인 세션 지속시간)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([createdAt])
+  @@index([action])
+}
+
+// ─────────────────────────────────────────
+// 읽기 시간 기록
+// ─────────────────────────────────────────
+
+model ReadingTimeLog {
+  id        String   @id @default(cuid())
+  userId    String
+  bookId    Int
+  chapter   Int
+  duration  Int      // seconds
+  readAt    DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([readAt])
+}
+
+// ─────────────────────────────────────────
+// 개인화 데이터
+// ─────────────────────────────────────────
+
+model Highlight {
+  id        String   @id @default(cuid())
+  userId    String
+  verseId   String
+  color     String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  verse     Verse    @relation(fields: [verseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, verseId])
+  @@index([userId])
+}
+
+model Memo {
+  id        String   @id @default(cuid())
+  userId    String
+  verseId   String
+  content   String   @db.Text
+  color     String   @default("yellow")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  verse     Verse    @relation(fields: [verseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, verseId])
+  @@index([userId])
+}
+
+model ReadingProgress {
+  id      String   @id @default(cuid())
+  userId  String
+  bookId  Int
+  chapter Int
+  readAt  DateTime @default(now())
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, bookId, chapter])
+  @@index([userId])
+}
+
+// 구절별 통독 완료 기록
+model VerseRead {
+  id      String   @id @default(cuid())
+  userId  String
+  verseId String
+  readAt  DateTime @default(now())
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  verse   Verse    @relation(fields: [verseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, verseId])
+  @@index([userId])
+}
+
+model QTNote {
+  id        String   @id @default(cuid())
+  userId    String
+  date      DateTime @db.Date
+  verseRef  String?
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@index([userId])
+}
+
+// ─────────────────────────────────────────
+// 뱃지 시스템
+// ─────────────────────────────────────────
+
+model Badge {
+  id          String      @id @default(cuid())
+  code        String      @unique
+  name        String
+  description String
+  icon        String      // emoji
+  rarity      String      @default("common") // "common" | "rare" | "epic" | "legendary"
+  sortOrder   Int         @default(0)
+  userBadges  UserBadge[]
+}
+
+model UserBadge {
+  id       String   @id @default(cuid())
+  userId   String
+  badgeId  String
+  earnedAt DateTime @default(now())
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  badge    Badge    @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, badgeId])
+  @@index([userId])
+}
+
+// ─────────────────────────────────────────
+// 커뮤니티 게시판
+// ─────────────────────────────────────────
+
+model Post {
+  id        String    @id @default(cuid())
+  userId    String
+  title     String
+  content   String    @db.Text
+  category  String    @default("general") // "general" | "prayer" | "testimony" | "question"
+  isPinned  Boolean   @default(false)
+  showBio   Boolean   @default(false)
+  viewCount Int       @default(0)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comments  Comment[]
+
+  @@index([userId])
+  @@index([createdAt])
+  @@index([category])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  userId    String
+  postId    String
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@index([postId])
+  @@index([userId])
+}
+
+// ─────────────────────────────────────────
+// 수정 요청 (사용자 → 관리자 승인)
+// ─────────────────────────────────────────
+
+model ChangeRequest {
+  id             String    @id @default(cuid())
+  userId         String
+  type           String    @default("profile") // "profile" | "verse"
+  field          String    // "name"|"phone"|"church"|"region"|"bio" | "textKo"|"textEn"
+  verseId        String?   // verse correction 시 사용
+  currentValue   String?
+  requestedValue String    @db.Text
+  reason         String?
+  status         String    @default("pending")
+  adminNote      String?
+  createdAt      DateTime  @default(now())
+  reviewedAt     DateTime?
+  reviewedBy     String?
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([status])
+  @@index([type])
+}
+
+// ─────────────────────────────────────────
+// 앱 전역 설정
+// ─────────────────────────────────────────
+
+model AppSetting {
+  key       String   @id
+  value     String   @db.Text
+  updatedAt DateTime @updatedAt
+  updatedBy String?
+}
+
+// ─────────────────────────────────────────
+// 기도문 (사도신경 / 주기도문) 버전 관리
+// ─────────────────────────────────────────
+
+model LiturgyText {
+  id        String   @id @default(cuid())
+  type      String   // "creed" | "prayer"
+  version   String   // "개역개정" | "새번역" | "공동번역"
+  content   String   @db.Text
+  isDefault Boolean  @default(false)
+  sortOrder Int      @default(0)
+  updatedAt DateTime @updatedAt
+  updatedBy String?
+
+  @@unique([type, version])
+  @@index([type])
+}
