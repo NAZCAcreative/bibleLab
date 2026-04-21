@@ -2,6 +2,7 @@
 import React, { useState } from 'react'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
+import { useSession } from 'next-auth/react'
 import { useBibleStore, THEMES } from '@/store/bibleStore'
 import { PrayerModal } from '@/presentation/components/bible/PrayerModal'
 
@@ -11,6 +12,7 @@ interface TopBarProps {
 
 export function TopBar({ onSettingsOpen }: TopBarProps) {
   const router = useRouter()
+  const { status } = useSession()
   const { currentBookId, currentChapter, theme, readingHistory } = useBibleStore()
   const tc = THEMES[theme]
   const [showPrayer, setShowPrayer] = useState(false)
@@ -23,7 +25,10 @@ export function TopBar({ onSettingsOpen }: TopBarProps) {
         <div className="flex items-center h-16 px-4 gap-3">
 
           <button
-            onClick={() => router.push(`/bible/${currentBookId}/${currentChapter}`)}
+            onClick={() => status === 'unauthenticated'
+              ? router.push('/auth/login')
+              : router.push(`/bible/${currentBookId}/${currentChapter}`)
+            }
             className="shrink-0 active:opacity-70 transition-opacity"
           >
             <Image

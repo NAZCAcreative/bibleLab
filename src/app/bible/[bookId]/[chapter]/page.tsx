@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { useParams, useSearchParams } from 'next/navigation'
 import { useSession } from 'next-auth/react'
+import Link from 'next/link'
 import { MobileLayout } from '@/presentation/components/layout/MobileLayout'
 import { TopBar } from '@/presentation/components/layout/TopBar'
 import { ChapterNavigator } from '@/presentation/components/bible/ChapterNavigator'
@@ -44,6 +45,7 @@ export default function BibleReaderPage() {
   const [showBookSelector, setShowBookSelector] = useState(false)
   const [showChapterSelector, setShowChapterSelector] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false)
 
   useEffect(() => { setPosition(bookId, chapter) }, [bookId, chapter, setPosition])
 
@@ -102,6 +104,7 @@ export default function BibleReaderPage() {
 
   // 통독모드: 구절 클릭 → 읽음 토글
   const handleReadToggle = useCallback(async (verseId: string) => {
+    if (status !== 'authenticated') { setShowLoginPrompt(true); return }
     setReadVerseIds((prev) => {
       const next = new Set(prev)
       if (next.has(verseId)) next.delete(verseId)
@@ -113,12 +116,13 @@ export default function BibleReaderPage() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ verseId }),
     }).catch(() => {})
-  }, [])
+  }, [status])
 
   // 노트모드: 구절 클릭
   const handleNotePress = useCallback((verseId: string) => {
+    if (status !== 'authenticated') { setShowLoginPrompt(true); return }
     setSelectedVerseId((prev) => (prev === verseId ? null : verseId))
-  }, [])
+  }, [status])
 
   const selectedVerse = data?.verses.find((v) => v.id === selectedVerseId)
   const verseRef = selectedVerse ? `${data?.book.nameKo} ${chapter}:${selectedVerse.verse}` : ''
@@ -263,7 +267,49 @@ export default function BibleReaderPage() {
           onClose={() => setShowChapterSelector(false)} initialMode="chapter" />
       )}
       {showSettings && <ReadingSettings onClose={() => setShowSettings(false)} />}
+
+      {showLoginPrompt && (
+        <LoginPromptModal onClose={() => setShowLoginPrompt(false)} />
+      )}
     </MobileLayout>
+  )
+}
+
+function LoginPromptModal({ onClose }: { onClose: () => void }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-end justify-center" onClick={onClose}>
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+      <div
+        className="relative w-full max-w-sm mb-6 mx-4 bg-white rounded-3xl shadow-2xl p-6 flex flex-col items-center gap-4"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="w-14 h-14 rounded-full flex items-center justify-center" style={{ backgroundColor: '#1a3d5c18' }}>
+          <LockIcon className="w-7 h-7" style={{ color: '#1a3d5c' }} />
+        </div>
+        <div className="text-center">
+          <p className="font-bold text-stone-800 text-base mb-1">로그인이 필요한 기능이에요</p>
+          <p className="text-stone-400 text-sm">통독 체크, 메모는 로그인 후 이용할 수 있어요</p>
+        </div>
+        <Link
+          href="/auth/login"
+          className="w-full py-3.5 rounded-2xl text-white font-semibold text-center shadow-md"
+          style={{ backgroundColor: '#1a3d5c' }}
+        >
+          로그인하기
+        </Link>
+        <button onClick={onClose} className="text-stone-400 text-sm">
+          계속 읽기
+        </button>
+      </div>
+    </div>
+  )
+}
+
+function LockIcon({ className, style }: { className?: string; style?: React.CSSProperties }) {
+  return (
+    <svg className={className} style={style} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+    </svg>
   )
 }
 

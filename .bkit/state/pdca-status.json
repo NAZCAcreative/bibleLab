@@ -1,6 +1,6 @@
 {
   "version": "3.0",
-  "lastUpdated": "2026-04-21T06:47:50.386Z",
+  "lastUpdated": "2026-04-21T08:51:25.802Z",
   "activeFeatures": [
     "bibleLab",
     "value-objects",
@@ -60,9 +60,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-04-15T11:35:20.950Z",
-        "lastUpdated": "2026-04-20T23:12:30.524Z"
+        "lastUpdated": "2026-04-21T08:03:26.200Z"
       },
-      "lastFile": "/mnt/d/aiCording/project/bibleLab/src/app/page.tsx"
+      "lastFile": "/mnt/d/aiCording/project/bibleLab/src/middleware.ts"
     },
     "value-objects": {
       "phase": "do",
@@ -229,7 +229,7 @@
       "documents": {},
       "timestamps": {
         "started": "2026-04-15T11:46:18.978Z",
-        "lastUpdated": "2026-04-20T21:11:54.609Z"
+        "lastUpdated": "2026-04-21T08:22:14.905Z"
       },
       "lastFile": "/mnt/d/aiCording/project/bibleLab/src/app/bible/[bookId]/[chapter]/page.tsx"
     },
@@ -307,9 +307,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-04-15T11:52:57.589Z",
-        "lastUpdated": "2026-04-20T23:13:15.783Z"
+        "lastUpdated": "2026-04-21T08:51:25.799Z"
       },
-      "lastFile": "/mnt/d/aiCording/project/bibleLab/src/presentation/components/layout/BottomNav.tsx"
+      "lastFile": "/mnt/d/aiCording/project/bibleLab/src/presentation/components/layout/TopBar.tsx"
     },
     "store": {
       "phase": "do",
@@ -385,7 +385,7 @@
       "documents": {},
       "timestamps": {
         "started": "2026-04-16T01:13:18.442Z",
-        "lastUpdated": "2026-04-18T00:07:01.769Z"
+        "lastUpdated": "2026-04-21T08:15:26.426Z"
       },
       "lastFile": "/mnt/d/aiCording/project/bibleLab/src/app/auth/login/page.tsx"
     },
@@ -658,7 +658,7 @@
   "session": {
     "startedAt": "2026-04-15T11:00:35.081Z",
     "onboardingCompleted": false,
-    "lastActivity": "2026-04-21T06:47:50.386Z"
+    "lastActivity": "2026-04-21T08:51:25.802Z"
   },
   "history": [
     {
@@ -5320,6 +5320,78 @@
     {
       "timestamp": "2026-04-21T06:47:50.386Z",
       "feature": "bible",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-21T08:03:26.205Z",
+      "feature": "bibleLab",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-21T08:15:26.428Z",
+      "feature": "login",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-21T08:17:16.899Z",
+      "feature": "[chapter]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-21T08:17:55.486Z",
+      "feature": "[chapter]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-21T08:18:02.955Z",
+      "feature": "[chapter]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-21T08:19:48.347Z",
+      "feature": "[chapter]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-21T08:20:04.814Z",
+      "feature": "[chapter]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-21T08:20:36.445Z",
+      "feature": "[chapter]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-21T08:22:14.907Z",
+      "feature": "[chapter]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-21T08:37:22.286Z",
+      "feature": "layout",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-21T08:37:56.989Z",
+      "feature": "layout",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-21T08:51:25.802Z",
+      "feature": "layout",
       "phase": "do",
       "action": "updated"
     }
