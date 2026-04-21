@@ -30,7 +30,7 @@ export function LanguageToggle({ bookId, chapter }: LanguageToggleProps) {
   const [visibility, setVisibility] = useState<Visibility>(DEFAULT_VIS)
 
   useEffect(() => {
-    fetch('/api/settings')
+    fetch('/api/settings', { cache: 'no-store' })
       .then((r) => r.json())
       .then((d) => {
         if (d?.data?.bibleLangVisibility) {

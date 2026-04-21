@@ -214,19 +214,26 @@ export default function AdminPage() {
 
   async function saveConfig() {
     setSavingConfig(true)
-    await Promise.all([
-      fetch('/api/admin/settings', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ key: 'bible_lang_visibility', value: langVisibility }),
-      }),
-      fetch('/api/admin/settings', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ key: 'nav_visibility', value: { community: communityVisible } }),
-      }),
-    ])
-    setSavingConfig(false)
+    try {
+      const results = await Promise.all([
+        fetch('/api/admin/settings', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ key: 'bible_lang_visibility', value: langVisibility }),
+        }),
+        fetch('/api/admin/settings', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ key: 'nav_visibility', value: { community: communityVisible } }),
+        }),
+      ])
+      const ok = results.every((r) => r.ok)
+      alert(ok ? '✅ 설정이 저장되었습니다.\n성경 페이지를 새로고침하면 적용됩니다.' : '❌ 저장 실패. 다시 시도해주세요.')
+    } catch {
+      alert('❌ 네트워크 오류가 발생했습니다.')
+    } finally {
+      setSavingConfig(false)
+    }
   }
 
   async function saveLiturgy() {
