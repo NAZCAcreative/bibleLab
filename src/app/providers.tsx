@@ -3,6 +3,7 @@ import { useEffect } from 'react'
 import { SessionProvider } from 'next-auth/react'
 import { useUserSettings } from '@/presentation/hooks/useUserSettings'
 import { useBibleStore } from '@/store/bibleStore'
+import { PWAInstallBanner } from '@/presentation/components/layout/PWAInstallBanner'
 
 function SettingsSync() {
   useUserSettings()
@@ -18,6 +19,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
     <SessionProvider>
       <SettingsSync />
       {children}
+      <PWAInstallBanner />
     </SessionProvider>
   )
 }

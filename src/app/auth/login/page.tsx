@@ -1,12 +1,13 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { signIn } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 
 export default function LoginPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [phase, setPhase] = useState<'splash' | 'login'>('splash')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -27,7 +28,8 @@ export default function LoginPage() {
     if (res?.error) {
       setError('이메일 또는 비밀번호가 올바르지 않습니다.')
     } else {
-      router.push('/bible/1/1')
+      const cb = searchParams.get('callbackUrl')
+      router.push(cb && cb.startsWith('/') ? cb : '/bible/1/1')
     }
   }
 

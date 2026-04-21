@@ -1,6 +1,6 @@
 'use client'
-import React, { useState, useEffect, useCallback } from 'react'
-import { useParams, useSearchParams } from 'next/navigation'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
+import { useParams, useSearchParams, useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import { MobileLayout } from '@/presentation/components/layout/MobileLayout'
@@ -20,6 +20,7 @@ import { getEasyKoreanVerse } from '@/data/easyKoreanGenesis'
 export default function BibleReaderPage() {
   const params = useParams()
   const searchParams = useSearchParams()
+  const router = useRouter()
   const bookId = Number(params.bookId)
   const chapter = Number(params.chapter)
   const targetVerse = Number(searchParams.get('verse') ?? '0')
@@ -46,6 +47,33 @@ export default function BibleReaderPage() {
   const [showChapterSelector, setShowChapterSelector] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
   const [showLoginPrompt, setShowLoginPrompt] = useState(false)
+
+  // 슬라이드 전환 방향
+  const [slideClass, setSlideClass] = useState('')
+  useEffect(() => {
+    const dir = sessionStorage.getItem('navDir')
+    sessionStorage.removeItem('navDir')
+    setSlideClass(dir === 'backward' ? 'chapter-enter-left' : 'chapter-enter-right')
+  }, [bookId, chapter])
+
+  // 스와이프 네비게이션
+  const touchStartX = useRef(0)
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX
+  }, [])
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    const delta = touchStartX.current - e.changedTouches[0].clientX
+    if (Math.abs(delta) < 60) return
+    if (delta > 0) {
+      sessionStorage.setItem('navDir', 'forward')
+      if (chapter < (data?.book.totalChapters ?? 1)) router.push(`/bible/${bookId}/${chapter + 1}`)
+      else if (bookId < 66) router.push(`/bible/${bookId + 1}/1`)
+    } else {
+      sessionStorage.setItem('navDir', 'backward')
+      if (chapter > 1) router.push(`/bible/${bookId}/${chapter - 1}`)
+      else if (bookId > 1) router.push(`/bible/${bookId - 1}/1`)
+    }
+  }, [bookId, chapter, data?.book.totalChapters, router])
 
   useEffect(() => { setPosition(bookId, chapter) }, [bookId, chapter, setPosition])
 
@@ -176,12 +204,7 @@ export default function BibleReaderPage() {
         </div>
       </div>
 
-      {isLoading && (
-        <div className="flex flex-col items-center justify-center h-64 gap-3">
-          <div className="w-8 h-8 border-2 rounded-full animate-spin" style={{ borderColor: tc.primary + '33', borderTopColor: tc.primary }} />
-          <div className="text-stone-400 text-sm">말씀을 불러오는 중...</div>
-        </div>
-      )}
+      {isLoading && <VerseSkeleton />}
 
       {!isLoading && (error || !data) && (
         <div className="flex items-center justify-center h-64">
@@ -193,7 +216,9 @@ export default function BibleReaderPage() {
         <>
 
           <article
-            className={`px-0 py-3 min-h-screen bible-text ${FONT_SIZE_CLASS[fontSize]} ${FONT_FAMILY_CLASS[fontFamily] ?? 'font-noto-sans-kr'}`}
+            className={`px-0 py-3 min-h-screen bible-text ${FONT_SIZE_CLASS[fontSize]} ${FONT_FAMILY_CLASS[fontFamily] ?? 'font-noto-sans-kr'} ${slideClass}`}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
             style={{
               backgroundImage: "url('/images/backgroundImg_01.jpg')",
               backgroundSize: '100% auto',
@@ -272,6 +297,23 @@ export default function BibleReaderPage() {
         <LoginPromptModal onClose={() => setShowLoginPrompt(false)} />
       )}
     </MobileLayout>
+  )
+}
+
+function VerseSkeleton() {
+  const widths = [85, 70, 90, 60, 80, 75, 95, 65, 88, 72, 78, 92]
+  return (
+    <div className="px-5 py-4 space-y-1" style={{ backgroundImage: "url('/images/backgroundImg_01.jpg')", backgroundSize: '100% auto', backgroundRepeat: 'repeat-y', backgroundColor: '#f5f2ed', minHeight: '100vh' }}>
+      {widths.map((w, i) => (
+        <div key={i} className="flex items-start gap-3 py-3 border-b border-stone-200/40">
+          <div className="skeleton-shimmer w-6 h-4 shrink-0 mt-1" />
+          <div className="flex-1 space-y-2">
+            <div className="skeleton-shimmer h-4" style={{ width: `${w}%` }} />
+            {w > 75 && <div className="skeleton-shimmer h-4" style={{ width: `${w - 20}%` }} />}
+          </div>
+        </div>
+      ))}
+    </div>
   )
 }
 

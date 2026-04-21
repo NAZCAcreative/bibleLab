@@ -15,6 +15,7 @@ export function ChapterNavigator({ bookId, chapter, totalChapters }: ChapterNavi
   const tc = THEMES[theme]
 
   const goPrev = () => {
+    sessionStorage.setItem('navDir', 'backward')
     if (chapter > 1) {
       router.push(`/bible/${bookId}/${chapter - 1}`)
     } else if (bookId > 1) {
@@ -24,6 +25,7 @@ export function ChapterNavigator({ bookId, chapter, totalChapters }: ChapterNavi
   }
 
   const goNext = () => {
+    sessionStorage.setItem('navDir', 'forward')
     if (chapter < totalChapters) {
       router.push(`/bible/${bookId}/${chapter + 1}`)
     } else if (bookId < 66) {

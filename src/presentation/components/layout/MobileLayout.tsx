@@ -12,7 +12,7 @@ export function MobileLayout({ children, hideBottomNav = false, hideTopBar = fal
   return (
     <div className={`min-h-screen bg-white${className ? ` ${className}` : ''}`}>
       {!hideTopBar && <SimpleTopBar />}
-      <main className={hideBottomNav ? '' : 'pb-20'}>
+      <main className={hideBottomNav ? '' : 'pb-safe-nav'}>
         {children}
       </main>
       {!hideBottomNav && <BottomNav />}
