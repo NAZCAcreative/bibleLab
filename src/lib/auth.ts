@@ -1,14 +1,11 @@
-// Design Ref: §7.2 — NextAuth.js 설정 (이메일 + 소셜 로그인)
-// Plan SC: FR-04 — JWT 기반 인증
 import type { NextAuthOptions } from 'next-auth'
-import { PrismaAdapter } from '@auth/prisma-adapter'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { prisma } from '@/infrastructure/db/client'
 import bcrypt from 'bcryptjs'
 
 export const authOptions: NextAuthOptions = {
-  // Design Ref: §7.2 — Prisma Adapter로 세션/계정 DB 저장
-  adapter: PrismaAdapter(prisma) as NextAuthOptions['adapter'],
+  // CredentialsProvider + JWT 전략에서는 PrismaAdapter 제거
+  // (adapter + credentials + jwt 조합은 쿠키 미설정 버그 유발)
   session: { strategy: 'jwt' },
   pages: {
     signIn: '/auth/login',
